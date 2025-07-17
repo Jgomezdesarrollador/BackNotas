@@ -35,5 +35,10 @@ namespace Application.Services
                 await _repo.SaveChangesAsync();
             }
         }
+
+        public async Task<(IEnumerable<Profesor>, int)> ListarPaginadoAsync(int page, int size)
+        {
+            return await _repo.GetPagedAsync(page, size);
+        }
     }
 }

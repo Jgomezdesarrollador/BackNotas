@@ -9,5 +9,6 @@ namespace Domain.Interfaces.Services
         Task CrearAsync(Profesor profesor);
         Task ActualizarAsync(Profesor profesor);
         Task EliminarAsync(int id);
+        Task<(IEnumerable<Profesor>, int)> ListarPaginadoAsync(int page, int size);
     }
 }

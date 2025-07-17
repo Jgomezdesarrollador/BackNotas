@@ -32,5 +32,19 @@ namespace Infrastructure.Repositories
 
         public async Task SaveChangesAsync() =>
             await _context.SaveChangesAsync();
+
+        public async Task<(IEnumerable<Nota>, int)> GetPagedAsync(int page, int size)
+        {
+            var query = _context.Notas.Include(n => n.Estudiante).Include(n => n.Profesor);
+
+            int total = await query.CountAsync();
+            var items = await query
+                .OrderBy(n => n.Id)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (items, total);
+        }
     }
 }

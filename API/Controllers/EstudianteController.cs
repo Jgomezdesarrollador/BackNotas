@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Domain.Entities;
 using Application.DTOs.Estudiante;
+using Application.DTOs.Paginacion;
 
 namespace API.Controllers
 {
@@ -177,6 +178,33 @@ namespace API.Controllers
                     origen: nameof(Delete));
 
                 return StatusCode(500, "Error al eliminar el estudiante.");
+            }
+        }
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            _logger.LogInformation("Listando estudiantes paginados");
+
+            try
+            {
+                var (estudiantes, total) = await _estudianteService.ListarPaginadoAsync(page, size);
+                var dtos = _mapper.Map<IEnumerable<EstudianteDto>>(estudiantes);
+
+                var resultado = new PagedResultDto<EstudianteDto>
+                {
+                    Items = dtos,
+                    TotalCount = total
+                };
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al listar estudiantes paginados");
+
+                await _logService.RegistrarAsync("Error", "Error en paginación", ex.ToString(), nameof(GetPaged));
+                return StatusCode(500, "Error interno");
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Profesor;
+﻿using Application.DTOs.Paginacion;
+using Application.DTOs.Profesor;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces.Services;
@@ -177,5 +178,34 @@ namespace API.Controllers
                 return StatusCode(500, "Error al eliminar el profesor.");
             }
         }
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var (profesores, total) = await _profesorService.ListarPaginadoAsync(page, size);
+                var dtos = _mapper.Map<IEnumerable<ProfesorDto>>(profesores);
+
+                var result = new PagedResultDto<ProfesorDto>
+                {
+                    Items = dtos,
+                    TotalCount = total
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al listar profesores paginados");
+                await _logService.RegistrarAsync(
+                    nivel: "Error",
+                    mensaje: "Error al listar profesores paginados",
+                    detalles: ex.ToString(),
+                    origen: nameof(Delete));
+                return StatusCode(500, "Error interno");
+            }
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Nota;
+using Application.DTOs.Paginacion;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces.Services;
@@ -175,6 +176,38 @@ namespace API.Controllers
                     origen: nameof(Delete));
 
                 return StatusCode(500, "Error al eliminar la nota.");
+            }
+        }
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            _logger.LogInformation("Listando notas paginadas");
+
+            try
+            {
+                var (notas, total) = await _notaService.ListarPaginadoAsync(page, size);
+                var dto = _mapper.Map<IEnumerable<NotaDto>>(notas);
+
+                var resultado = new PagedResultDto<NotaDto>
+                {
+                    Items = dto,
+                    TotalCount = total
+                };
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al listar notas paginadas");
+
+                await _logService.RegistrarAsync(
+                    nivel: "Error",
+                    mensaje: "Error al listar notas paginadas",
+                    detalles: ex.ToString(),
+                    origen: nameof(GetPaged));
+
+                return StatusCode(500, "Error interno del servidor.");
             }
         }
     }

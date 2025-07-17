@@ -10,5 +10,6 @@ namespace Domain.Interfaces.Repositories
         void Update(Profesor profesor);
         void Delete(Profesor profesor);
         Task SaveChangesAsync();
+        Task<(IEnumerable<Profesor>, int)> GetPagedAsync(int page, int size);
     }
 }
