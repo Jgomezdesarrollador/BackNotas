@@ -21,7 +21,7 @@ namespace Infrastructure.Persistences.Configurations
             builder.HasOne(n => n.Estudiante)
                 .WithMany(e => e.Notas)
                 .HasForeignKey(n => n.IdEstudiante)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(n => n.Profesor)
                 .WithMany(p => p.Notas)
